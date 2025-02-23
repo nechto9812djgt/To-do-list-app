@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="main.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap');
+    </style>
+    <title>To-do list</title>
+</head>
+<body>
+    <div id="to-do-list">
+        <h1>{{header || 'Welcome'}}</h1>
+        <div class="show-form">
+            <button v-if="editing" @click="Edit(false)" class="close">Cancel</button>
+            <button v-else @click="Edit(true)" class="show">Show list</button>
+        </div>
+        <div v-if="editing" class="add-item-form">
+            <input @keyup.enter="AddItem" v-model="newItem" type="text" placeholder="What are you going to do today">
+            <p class="counter">{{Count}}/200</p>
+            <button :disabled="newItem.length === 0 || newItem.length > 200" @click="AddItem" class="add-item-btn">Add Item</button>
+        </div>
+        <p v-if="items.length === 0 && editing">Let's make a list!</p>
+        <ul class="list-of-items" oncontextmenu="return false;">
+            <li v-for="item in ReversedItems" :key="item.id"
+            @click="DoneItem(item)"
+            @click.right="PriorityItem(item)"
+            :class="{done_item: item.purchased, priority_item: item.priority}"
+            >{{item.label}}
+            </li>
+        </ul>
+    </div>
+
+    <script src="https://unpkg.com/vue@3"></script>
+
+    <script>
+        Vue.createApp({
+            data(){
+                return {
+                    header: "To-do list App",
+                    newItem:'',
+                    editing: false,
+                    items: []
+                }
+            },
+            computed:{
+                Count(){
+                    return this.newItem.length
+                },
+                ReversedItems(){
+                    return [...this.items].reverse()
+                }
+            },
+            methods:{
+                AddItem(){
+                    this.items.push({id: this.items.length + 1, label: this.newItem,
+                        purchased: false, priority: false})
+                    this.newItem = ''
+                },
+                Edit(editing){
+                    this.editing = editing
+                },
+                DoneItem(item){
+                    item.purchased = !item.purchased
+                },
+                PriorityItem(item){
+                    item.priority = !item.priority
+                }
+            }
+        })
+        .mount('#to-do-list')
+    </script>
+</body>
+</html>
